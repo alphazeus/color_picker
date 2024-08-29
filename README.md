@@ -1,7 +1,7 @@
 # color_picker
 Lightweight ImGUI based onscreen color picker application  
 
-[ ] Setting up Cmake environment for GLFW  
+[X] Setting up Cmake environment for GLFW  
 [ ] Getting the OpenGL window up with GLFW  
 [ ] Adding ImGui to Cmake system  
 [ ] Integrate ImGui to OpenGL window  
