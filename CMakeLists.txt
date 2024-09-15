@@ -5,8 +5,11 @@ add_subdirectory(lib/glfw-3.4)
 
 FILE(GLOB_RECURSE imgui_files lib/imgui/*.h lib/imgui/*.cpp) 
 
+FILE(GLOB_RECURSE src_files src/*.h src/*.cpp) 
+
+
 add_executable(color_picker 
-    src/main.cpp 
+    ${src_files}
     ${imgui_files}
 )
 
