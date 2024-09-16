@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Work\C++\imgui\color_picker\CMakeFiles\80dbde337bfaaa9bbb10a9ecb7a81317\update_mappings.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Work\C++\imgui\color_picker\lib\glfw-3.4\src\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Work\C++\imgui\color_picker\lib\glfw-3.4\src\mappings.h.in">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Work\C++\imgui\color_picker\lib\glfw-3.4\CMake\GenerateMappings.cmake" />
+    <None Include="C:\Work\C++\imgui\color_picker\lib\glfw-3.4\src\CMakeFiles\update_mappings" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{6035A9F7-0DEA-3204-ABCF-EBAFB43BC9CE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{3D510A32-B514-37BE-B16A-BE192D97A4B9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -14,8 +14,8 @@ namespace renderSpace
 
         //List of all the boxes to be rendered in the application window
         renderPreviewBox(display_w, display_h);
-        renderImageBox();
-        renderMouseContolBox();
+        renderImageBox(display_w, display_h);
+        renderMouseContolBox(display_w, display_h);
     }
 
     void renderPreviewBox(int display_w, int display_h){
@@ -23,12 +23,16 @@ namespace renderSpace
         //Backend for the live pixel data collection from viewport
         ImGuiIO& io = ImGui::GetIO();
 
-        ImGui::Begin("Selected Color");
+        int previewBoxXPos = (display_w - 300);
+        int previewBoxYPos = 0;
+        static float previewBoxSize = 300.0f;
+        ImGui::SetNextWindowPos(ImVec2(previewBoxXPos, previewBoxYPos));
+        ImGui::SetNextWindowSize(ImVec2(previewBoxSize, previewBoxSize));
+        ImGui::Begin("Selected Color", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
         int previewPixelCount = 5;                  //Number of pixels to be displayed in X and Y direction preview
         int channelCount = 4;                       //Number of channels in the image
-        static float previewBoxSize = 300.0f;
+        
         int pixelToPick = previewPixelCount*previewPixelCount/2;  //Selecting the center pixel of the preview
-        const ImVec2 p = ImGui::GetCursorScreenPos();
         float pixel[previewPixelCount * previewPixelCount * channelCount];
         float selectPixel[4];
         
@@ -46,15 +50,21 @@ namespace renderSpace
                 selectPixel[3] = pixel[i*4 + 3];
             }
             col = ImColor(ImVec4(pixel[i*4], pixel[i*4 + 1], pixel[i*4 + 2], pixel[i*4 + 3]));
-            draw_list->AddRectFilled(ImVec2(p.x + (i%previewPixelCount) * previewBoxSize/previewPixelCount, p.y + (i/previewPixelCount) * previewBoxSize/previewPixelCount), ImVec2(p.x + (i%previewPixelCount + 1) * previewBoxSize/previewPixelCount, p.y + (i/previewPixelCount + 1) * previewBoxSize/previewPixelCount), col);
+            draw_list->AddRectFilled(ImVec2(previewBoxXPos + (i%previewPixelCount) * previewBoxSize/previewPixelCount, previewBoxYPos + (i/previewPixelCount) * previewBoxSize/previewPixelCount), ImVec2(previewBoxXPos + (i%previewPixelCount + 1) * previewBoxSize/previewPixelCount, previewBoxYPos + (i/previewPixelCount + 1) * previewBoxSize/previewPixelCount), col);
         }
 
-        draw_list->AddRect(ImVec2(p.x + (pixelToPick%previewPixelCount) * previewBoxSize/previewPixelCount, p.y + (pixelToPick/previewPixelCount) * previewBoxSize/previewPixelCount), ImVec2(p.x + (pixelToPick%previewPixelCount + 1) * previewBoxSize/previewPixelCount, p.y + (pixelToPick/previewPixelCount + 1) * previewBoxSize/previewPixelCount), IM_COL32(195, 255, 104, 255));
+        draw_list->AddRect(ImVec2(previewBoxXPos + (pixelToPick%previewPixelCount) * previewBoxSize/previewPixelCount, previewBoxYPos + (pixelToPick/previewPixelCount) * previewBoxSize/previewPixelCount), ImVec2(previewBoxXPos + (pixelToPick%previewPixelCount + 1) * previewBoxSize/previewPixelCount, previewBoxYPos + (pixelToPick/previewPixelCount + 1) * previewBoxSize/previewPixelCount), IM_COL32(195, 255, 104, 255));
         ImGui::End();
     }
 
-    void renderImageBox(){
-        ImGui::Begin("Image viewer");
+    void renderImageBox(int display_w, int display_h){
+        int previewBoxXPos = 0;
+        int previewBoxYPos = 0;
+        float previewBoxSizeX = display_w - 300.0f;
+        float previewBoxSizeY = display_h;
+        ImGui::SetNextWindowPos(ImVec2(previewBoxXPos, previewBoxYPos));
+        ImGui::SetNextWindowSize(ImVec2(previewBoxSizeX, previewBoxSizeY));
+        ImGui::Begin("Image viewer", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
         if(!imageControl.isImageLoaded){
             bool ret = imageControl.LoadTextureFromFile("C:\\Work\\C++\\imgui\\color_picker\\resoures\\MyImage01.jpg", &imageControl.my_image_texture, &imageControl.my_image_width, &imageControl.my_image_height);
             IM_ASSERT(ret);
@@ -62,15 +72,22 @@ namespace renderSpace
         }
         ImGui::Text("pointer = %x", imageControl.my_image_texture);
         ImGui::Text("size = %d x %d", imageControl.my_image_width, imageControl.my_image_height);
+        ImGui::SetCursorPos(ImVec2(((previewBoxXPos + previewBoxSizeX) / 2 - imageControl.my_image_width / 2 ), ((previewBoxYPos + previewBoxSizeY) / 2 - imageControl.my_image_height / 2 )));
         ImGui::Image((void*)(intptr_t)imageControl.my_image_texture, ImVec2(imageControl.my_image_width, imageControl.my_image_height));
         ImGui::End();
     }
 
-    void renderMouseContolBox(){
+    void renderMouseContolBox(int display_w, int display_h){
         ImGuiIO& io = ImGui::GetIO();
 
         //Display of the mouse position and other inputs
-        ImGui::Begin("Mouse Position");
+        int previewBoxXPos = (display_w - 300);
+        int previewBoxYPos = 300;
+        float previewBoxSizeX = 300.0f;
+        float previewBoxSizeY = display_h - 300;
+        ImGui::SetNextWindowPos(ImVec2(previewBoxXPos, previewBoxYPos));
+        ImGui::SetNextWindowSize(ImVec2(previewBoxSizeX, previewBoxSizeY));
+        ImGui::Begin("Mouse Position", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
         // Display inputs submitted to ImGuiIO
         
             if (ImGui::IsMousePosValid())
