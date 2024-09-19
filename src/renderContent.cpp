@@ -31,11 +31,18 @@ namespace renderSpace
         ImGui::SetNextWindowSize(ImVec2(previewBoxSizeX, previewBoxSizeY));
         ImGui::Begin("Image Selection", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
         ImGui::Text("Input the file path for the image:");
-        ImGui::InputText("File Path", imageControl.filepath, IM_ARRAYSIZE(imageControl.filepath));
-        ImGui::Text("Select Image");
+        ImGui::Text("(jpg, png, bmp, tga, gif, psd, hdr, pic)");
+        ImGui::NewLine();
+
+
+        ImGui::PushItemWidth(-1);
+        ImGui::InputText("##label", imageControl.filepath, IM_ARRAYSIZE(imageControl.filepath), ImGuiInputTextFlags_None);
+        ImGui::PopItemWidth();
+        ImGui::NewLine();
 
         if(ImGui::Button("Load Image", ImVec2(100, 50))){
             bool ret = imageControl.LoadTextureFromFile(imageControl.filepath, &imageControl.my_image_texture, &imageControl.my_image_width, &imageControl.my_image_height);
+            imageControl.zoomFactor = 1.0f;
             imageControl.isImageLoaded = ret;
         }
         ImGui::End();
@@ -53,11 +60,10 @@ namespace renderSpace
         ImGui::SetNextWindowSize(ImVec2(previewBoxSize, previewBoxSize));
         ImGui::Begin("Selected Color", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
         int previewPixelCount = 5;                  //Number of pixels to be displayed in X and Y direction preview
-        int channelCount = 4;                       //Number of channels in the image
+        int channelCount = imageControl.my_image_channels;                       //Number of channels in the image
         
         int pixelToPick = previewPixelCount*previewPixelCount/2;  //Selecting the center pixel of the preview
         float pixel[previewPixelCount * previewPixelCount * channelCount];
-        float selectPixel[4];
         
         glReadPixels(io.MousePos.x, (display_h - io.MousePos.y), previewPixelCount, previewPixelCount, GL_RGBA, GL_FLOAT, &pixel);
         imageControl.flipimage_y(previewPixelCount, previewPixelCount, channelCount, pixel); //Flip the image to match the image coordinate system between OpenGL and ImGui
@@ -67,16 +73,17 @@ namespace renderSpace
         ImU32 col;
         for( int i = 0; i< previewPixelCount*previewPixelCount; i++){
             if(i == (pixelToPick)){
-                selectPixel[0] = pixel[i*4];
-                selectPixel[1] = pixel[i*4 + 1];
-                selectPixel[2] = pixel[i*4 + 2];
-                selectPixel[3] = pixel[i*4 + 3];
+                imageControl.currentPixel[0] = pixel[i*4];
+                imageControl.currentPixel[1] = pixel[i*4 + 1];
+                imageControl.currentPixel[2] = pixel[i*4 + 2];
+                imageControl.currentPixel[3] = pixel[i*4 + 3];
             }
             col = ImColor(ImVec4(pixel[i*4], pixel[i*4 + 1], pixel[i*4 + 2], pixel[i*4 + 3]));
             draw_list->AddRectFilled(ImVec2(previewBoxXPos + (i%previewPixelCount) * previewBoxSize/previewPixelCount, previewBoxYPos + (i/previewPixelCount) * previewBoxSize/previewPixelCount), ImVec2(previewBoxXPos + (i%previewPixelCount + 1) * previewBoxSize/previewPixelCount, previewBoxYPos + (i/previewPixelCount + 1) * previewBoxSize/previewPixelCount), col);
         }
 
         draw_list->AddRect(ImVec2(previewBoxXPos + (pixelToPick%previewPixelCount) * previewBoxSize/previewPixelCount, previewBoxYPos + (pixelToPick/previewPixelCount) * previewBoxSize/previewPixelCount), ImVec2(previewBoxXPos + (pixelToPick%previewPixelCount + 1) * previewBoxSize/previewPixelCount, previewBoxYPos + (pixelToPick/previewPixelCount + 1) * previewBoxSize/previewPixelCount), IM_COL32(195, 255, 104, 255));
+        
         ImGui::End();
     }
 
@@ -105,6 +112,13 @@ namespace renderSpace
             imageControl.zoomFactor += io.MouseWheel/10;
         }
 
+        //Code to get the pixel color to be selected
+        if(ImGui::IsWindowHovered() && io.MouseClicked[0]){
+            imageControl.selectPixel[0] = imageControl.currentPixel[0];
+            imageControl.selectPixel[1] = imageControl.currentPixel[1];
+            imageControl.selectPixel[2] = imageControl.currentPixel[2];
+            imageControl.selectPixel[3] = imageControl.currentPixel[3];
+        }
         ImGui::End();
     }
 
@@ -120,40 +134,29 @@ namespace renderSpace
         ImGui::SetNextWindowSize(ImVec2(previewBoxSizeX, previewBoxSizeY));
         ImGui::Begin("Mouse Position", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
         // Display inputs submitted to ImGuiIO
-        
-            if (ImGui::IsMousePosValid())
-                ImGui::Text("Mouse pos: (%g, %g)", io.MousePos.x, io.MousePos.y);
-            else
-                ImGui::Text("Mouse pos: <INVALID>");
-            ImGui::Text("Mouse delta: (%g, %g)", io.MouseDelta.x, io.MouseDelta.y);
-            ImGui::Text("Mouse down:");
-            for (int i = 0; i < IM_ARRAYSIZE(io.MouseDown); i++) if (ImGui::IsMouseDown(i)) { ImGui::SameLine(); ImGui::Text("b%d (%.02f secs)", i, io.MouseDownDuration[i]); }
-            ImGui::Text("Mouse wheel: %.1f", io.MouseWheel);
+            ImGui::Text("Color Hovered RGB:");
+            int rgbCurrentPixel[4];
+            imageControl.pixelToRGB(imageControl.currentPixel, rgbCurrentPixel);
+            ImGui::Text("R: %d, G: %d, B: %d, A: %d", rgbCurrentPixel[0], rgbCurrentPixel[1], rgbCurrentPixel[2], rgbCurrentPixel[3]);
+            ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(ImGui::GetCursorScreenPos()), ImVec2(ImGui::GetCursorScreenPos().x + 250, ImGui::GetCursorScreenPos().y + 15), IM_COL32(rgbCurrentPixel[0], rgbCurrentPixel[1], rgbCurrentPixel[2], rgbCurrentPixel[3]));
+            
+            ImGui::NewLine();
 
-            // We iterate both legacy native range and named ImGuiKey ranges. This is a little unusual/odd but this allows
-            // displaying the data for old/new backends.
-            // User code should never have to go through such hoops!
-            // You can generally iterate between ImGuiKey_NamedKey_BEGIN and ImGuiKey_NamedKey_END.
-#ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
-            struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
-            ImGuiKey start_key = ImGuiKey_NamedKey_BEGIN;
-#else
-            struct funcs { static bool IsLegacyNativeDupe(ImGuiKey key) { return key >= 0 && key < 512 && ImGui::GetIO().KeyMap[key] != -1; } }; // Hide Native<>ImGuiKey duplicates when both exists in the array
-            ImGuiKey start_key = (ImGuiKey)0;
-#endif
-            ImGui::Text("Keys down:");         for (ImGuiKey key = start_key; key < ImGuiKey_NamedKey_END; key = (ImGuiKey)(key + 1)) { if (funcs::IsLegacyNativeDupe(key) || !ImGui::IsKeyDown(key)) continue; ImGui::SameLine(); ImGui::Text((key < ImGuiKey_NamedKey_BEGIN) ? "\"%s\"" : "\"%s\" %d", ImGui::GetKeyName(key), key); }
-            ImGui::Text("Keys mods: %s%s%s%s", io.KeyCtrl ? "CTRL " : "", io.KeyShift ? "SHIFT " : "", io.KeyAlt ? "ALT " : "", io.KeySuper ? "SUPER " : "");
-            ImGui::Text("Chars queue:");       for (int i = 0; i < io.InputQueueCharacters.Size; i++) { ImWchar c = io.InputQueueCharacters[i]; ImGui::SameLine();  ImGui::Text("\'%c\' (0x%04X)", (c > ' ' && c <= 255) ? (char)c : '?', c); } // FIXME: We should convert 'c' to UTF-8 here but the functions are not public.
-    
+            ImGui::Text("Color Selected RGB:");
+            int rgbSelectPixel[4];
+            imageControl.pixelToRGB(imageControl.selectPixel, rgbSelectPixel);
+            ImGui::Text("R: %d, G: %d, B: %d, A: %d", rgbSelectPixel[0], rgbSelectPixel[1], rgbSelectPixel[2], rgbSelectPixel[3]);
+            ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(ImGui::GetCursorScreenPos()), ImVec2(ImGui::GetCursorScreenPos().x + 250, ImGui::GetCursorScreenPos().y + 15), IM_COL32(rgbSelectPixel[0], rgbSelectPixel[1], rgbSelectPixel[2], rgbSelectPixel[3]));
 
-        GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport);
+            ImGui::NewLine();
 
-    int x = viewport[0];
-    int y = viewport[1];
-    int width = viewport[2];
-    int height = viewport[3];
-        ImGui::Text("Coordinate Viewport: (%g, %g, %g, %g)", x, y, width, height);
+
+            ImGui::NewLine();
+            ImGui::Text("Color Selected HSV:");
+            int hsvSelectPixel[4];
+            imageControl.pixelToHSV(imageControl.selectPixel, hsvSelectPixel);
+            ImGui::Text("H: %d, S: %d, V: %d, A: %d", hsvSelectPixel[0], hsvSelectPixel[1], hsvSelectPixel[2], hsvSelectPixel[3]);
+
         ImGui::End();
     }
 }

@@ -69,3 +69,40 @@ void imageController::flipimage_y(int width, int height, int channels, float* da
     }
 }
 
+void imageController::pixelToRGB(float* floatPixel, int* rgbPixel)
+{
+    rgbPixel[0] = (int)(floatPixel[0] * 255);
+    rgbPixel[1] = (int)(floatPixel[1] * 255);
+    rgbPixel[2] = (int)(floatPixel[2] * 255);
+    rgbPixel[3] = (int)(floatPixel[3] * 255);
+}
+
+void imageController::pixelToHSV(float* floatPixel, int* hsvPixel){
+    float r = floatPixel[0];
+    float g = floatPixel[1];
+    float b = floatPixel[2];
+    float a = floatPixel[3];
+
+    double cmax = (r > g) ? r : g;
+    if (b > cmax) cmax = b;
+    double cmin = (r < g) ? r : g;
+    if (b < cmin) cmin = b;
+    double diff =  cmax-cmin;
+
+    double h = -1;
+    if (cmax == cmin)
+        h = 0;
+    else if (cmax == r)
+        h = fmod( 60 * ((g - b) / diff)+360, 360);
+    else if (cmax == g)
+        h = fmod( 60 * ((b - r) / diff)+360, 360);
+    else if (cmax == b)
+        h = fmod( 60 * ((r - g) / diff)+360, 360);
+
+    double s = (cmax == 0.0) ? 0.0 : diff / cmax * 100;
+    float v = cmax * 100;
+    hsvPixel[0] = (int)(h);
+    hsvPixel[1] = (int)(s);
+    hsvPixel[2] = (int)(v);
+    hsvPixel[3] = (int)(a * 255);
+}
