@@ -1,6 +1,20 @@
 # color_picker
 Lightweight GLFW + ImGUI based onscreen color picker application (PoC for ImGui and GLFW integration)
+![alt text](resoures/window_1.png)
 
+## Features
+- Scalable Preview Panel with zoom control for high precision (editable with code)
+- Pick pixels from loaded images
+- Zooming enabled for the images loaded for more precise control
+- Resizable window 
+- Support for JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC formats
+
+## Dependencies (Built with)  
+-   GLFW 3.4
+-   [Dear ImGui](https://github.com/ocornut/imgui)
+-   stb_image
+
+### checklist
 - [X] Setting up Cmake environment for GLFW  
 - [X] Getting the OpenGL window up with GLFW  
 - [X] Adding ImGui to Cmake system  
@@ -14,17 +28,5 @@ Lightweight GLFW + ImGUI based onscreen color picker application (PoC for ImGui 
 - [X] Correcting the file system
 - [ ] Display of Color picked
 - [ ] Converstion to other color spaces (HSV)
-
-## Features
-- Scalable Preview Panel with zoom control for high precision (editable with code)
-- Pick pixels from loaded images
-- Zooming enabled for the images loaded for more precise control
-- Resizable window 
-- Support for JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC formats
-
-## Dependencies (Built with)  
--   GLFW 3.4
--   [Dear ImGui](https://github.com/ocornut/imgui)
--   stb_image
 
 ## Known bugs
