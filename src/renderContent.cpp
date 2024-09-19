@@ -2,7 +2,6 @@
 #include "imgui.h"
 #include "imageFunctions.h"
 
-
 imageController imageControl;
 
 namespace renderSpace
@@ -13,9 +12,33 @@ namespace renderSpace
         glfwGetFramebufferSize(window, &display_w, &display_h);
 
         //List of all the boxes to be rendered in the application window
+        renderImageSelectionBox(display_w, display_h);
         renderPreviewBox(display_w, display_h);
-        renderImageBox(display_w, display_h);
         renderMouseContolBox(display_w, display_h);
+        renderImageBox(display_w, display_h);
+    }
+
+
+    void renderImageSelectionBox(int display_w, int display_h){
+        //Backend for the image selection box
+        ImGuiIO& io = ImGui::GetIO();
+
+        int previewBoxXPos = display_w - 300;
+        int previewBoxYPos = 0;
+        float previewBoxSizeX = 300.0f;
+        float previewBoxSizeY = 200.0f;
+        ImGui::SetNextWindowPos(ImVec2(previewBoxXPos, previewBoxYPos));
+        ImGui::SetNextWindowSize(ImVec2(previewBoxSizeX, previewBoxSizeY));
+        ImGui::Begin("Image Selection", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+        ImGui::Text("Input the file path for the image:");
+        ImGui::InputText("File Path", imageControl.filepath, IM_ARRAYSIZE(imageControl.filepath));
+        ImGui::Text("Select Image");
+
+        if(ImGui::Button("Load Image", ImVec2(100, 50))){
+            bool ret = imageControl.LoadTextureFromFile(imageControl.filepath, &imageControl.my_image_texture, &imageControl.my_image_width, &imageControl.my_image_height);
+            imageControl.isImageLoaded = ret;
+        }
+        ImGui::End();
     }
 
     void renderPreviewBox(int display_w, int display_h){
@@ -24,7 +47,7 @@ namespace renderSpace
         ImGuiIO& io = ImGui::GetIO();
 
         int previewBoxXPos = (display_w - 300);
-        int previewBoxYPos = 0;
+        int previewBoxYPos = 200;
         static float previewBoxSize = 300.0f;
         ImGui::SetNextWindowPos(ImVec2(previewBoxXPos, previewBoxYPos));
         ImGui::SetNextWindowSize(ImVec2(previewBoxSize, previewBoxSize));
@@ -58,6 +81,8 @@ namespace renderSpace
     }
 
     void renderImageBox(int display_w, int display_h){
+        ImGuiIO& io = ImGui::GetIO();
+
         int previewBoxXPos = 0;
         int previewBoxYPos = 0;
         float previewBoxSizeX = display_w - 300.0f;
@@ -65,15 +90,21 @@ namespace renderSpace
         ImGui::SetNextWindowPos(ImVec2(previewBoxXPos, previewBoxYPos));
         ImGui::SetNextWindowSize(ImVec2(previewBoxSizeX, previewBoxSizeY));
         ImGui::Begin("Image viewer", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
-        if(!imageControl.isImageLoaded){
-            bool ret = imageControl.LoadTextureFromFile("C:\\Work\\C++\\imgui\\color_picker\\resoures\\MyImage01.jpg", &imageControl.my_image_texture, &imageControl.my_image_width, &imageControl.my_image_height);
-            IM_ASSERT(ret);
-            imageControl.isImageLoaded = true;
+        if(imageControl.isImageLoaded){
+            ImGui::Text("pointer = %x", imageControl.my_image_texture);
+            ImGui::Text("size = %d x %d", imageControl.my_image_width, imageControl.my_image_height);
+            ImGui::SetCursorPos(ImVec2(((previewBoxXPos + previewBoxSizeX) / 2 - ( imageControl.my_image_width * imageControl.zoomFactor ) / 2 ), ((previewBoxYPos + previewBoxSizeY) / 2 - ( imageControl.my_image_height * imageControl.zoomFactor ) / 2 )));
+            ImGui::Image((void*)(intptr_t)imageControl.my_image_texture, ImVec2(imageControl.my_image_width*imageControl.zoomFactor, imageControl.my_image_height*imageControl.zoomFactor));
         }
-        ImGui::Text("pointer = %x", imageControl.my_image_texture);
-        ImGui::Text("size = %d x %d", imageControl.my_image_width, imageControl.my_image_height);
-        ImGui::SetCursorPos(ImVec2(((previewBoxXPos + previewBoxSizeX) / 2 - imageControl.my_image_width / 2 ), ((previewBoxYPos + previewBoxSizeY) / 2 - imageControl.my_image_height / 2 )));
-        ImGui::Image((void*)(intptr_t)imageControl.my_image_texture, ImVec2(imageControl.my_image_width, imageControl.my_image_height));
+        else{
+            ImGui::Text("No Image Loaded");
+        }
+        
+        //Code to check if the zoom factor needs change
+        if(ImGui::IsWindowHovered() && io.MouseWheel != 0.0f){
+            imageControl.zoomFactor += io.MouseWheel/10;
+        }
+
         ImGui::End();
     }
 
@@ -82,9 +113,9 @@ namespace renderSpace
 
         //Display of the mouse position and other inputs
         int previewBoxXPos = (display_w - 300);
-        int previewBoxYPos = 300;
+        int previewBoxYPos = 500;
         float previewBoxSizeX = 300.0f;
-        float previewBoxSizeY = display_h - 300;
+        float previewBoxSizeY = display_h - 500;
         ImGui::SetNextWindowPos(ImVec2(previewBoxXPos, previewBoxYPos));
         ImGui::SetNextWindowSize(ImVec2(previewBoxSizeX, previewBoxSizeY));
         ImGui::Begin("Mouse Position", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
@@ -113,7 +144,6 @@ namespace renderSpace
             ImGui::Text("Keys down:");         for (ImGuiKey key = start_key; key < ImGuiKey_NamedKey_END; key = (ImGuiKey)(key + 1)) { if (funcs::IsLegacyNativeDupe(key) || !ImGui::IsKeyDown(key)) continue; ImGui::SameLine(); ImGui::Text((key < ImGuiKey_NamedKey_BEGIN) ? "\"%s\"" : "\"%s\" %d", ImGui::GetKeyName(key), key); }
             ImGui::Text("Keys mods: %s%s%s%s", io.KeyCtrl ? "CTRL " : "", io.KeyShift ? "SHIFT " : "", io.KeyAlt ? "ALT " : "", io.KeySuper ? "SUPER " : "");
             ImGui::Text("Chars queue:");       for (int i = 0; i < io.InputQueueCharacters.Size; i++) { ImWchar c = io.InputQueueCharacters[i]; ImGui::SameLine();  ImGui::Text("\'%c\' (0x%04X)", (c > ' ' && c <= 255) ? (char)c : '?', c); } // FIXME: We should convert 'c' to UTF-8 here but the functions are not public.
-            // ImGui::Text("Pixel: (%g, %g, %g, %g)", selectPixel[0], selectPixel[1], selectPixel[2], selectPixel[3]);
     
 
         GLint viewport[4];
