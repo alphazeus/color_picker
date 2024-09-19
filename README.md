@@ -1,6 +1,6 @@
 # color_picker
 Lightweight GLFW + ImGUI based onscreen color picker application (PoC for ImGui and GLFW integration)
-![alt text](resoures/window_1.png)
+<img src = "resoures/window_1.png" width="700">
 
 ## Features
 - Scalable Preview Panel with zoom control for high precision (editable with code)
