@@ -26,7 +26,7 @@ Lightweight GLFW + ImGUI based onscreen color picker application (PoC for ImGui 
 - [X] Loading of images onto the render window
 - [X] Split the rendering of OpenGL into different rendering class
 - [X] Correcting the file system
-- [ ] Display of Color picked
-- [ ] Converstion to other color spaces (HSV)
+- [X] Display of Color picked
+- [X] Converstion to other color spaces (HSV)
 
 ## Known bugs
