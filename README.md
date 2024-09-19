@@ -3,11 +3,12 @@ Lightweight GLFW + ImGUI based onscreen color picker application (PoC for ImGui 
 <img src = "resoures/window_1.png" width="700">
 
 ## Features
-- Scalable Preview Panel with zoom control for high precision (editable with code)
-- Pick pixels from loaded images
-- Zooming enabled for the images loaded for more precise control
-- Resizable window 
-- Support for JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC formats
+- Scalable Preview Panel with zoom control for high precision (editable with code).
+- Pick pixels from loaded images.
+- Zooming enabled for the images loaded for more precise control.
+- Resizable window.
+- Support for JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC formats.
+- Color Picker with RGB and HSV Conversion.
 
 ## Dependencies (Built with)  
 -   GLFW 3.4
@@ -28,5 +29,7 @@ Lightweight GLFW + ImGUI based onscreen color picker application (PoC for ImGui 
 - [X] Correcting the file system
 - [X] Display of Color picked
 - [X] Converstion to other color spaces (HSV)
+- [ ] Change the title icon with custom one
+- [ ] Create Custom Titlebar
 
 ## Known bugs

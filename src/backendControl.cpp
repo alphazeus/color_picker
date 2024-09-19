@@ -1,6 +1,7 @@
 #include "backendControl.h"
 #include <stdio.h>
 #include "rendercontent.h"
+#include "iconListHeader.h"
 
 void openGLController::glfw_error_callback(int error, const char* description)
 {
@@ -12,11 +13,14 @@ GLFWwindow* openGLController::initGlfwWindow(int width, int height, const char* 
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return nullptr;
-
+    
     // Create window with graphics context
     GLFWwindow* window = glfwCreateWindow(width, height, title, nullptr, nullptr);
     if (window == nullptr)
         return nullptr;
+
+    titleIconize titleIcon;
+    glfwSetWindowIcon(window, 1, &titleIcon.titleIcon);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
