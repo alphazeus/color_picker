@@ -7,7 +7,7 @@ class imageController
         int my_image_width = 0;
         int my_image_height = 0;
         int my_image_channels = 4;
-        char filepath[512] = "C:\\Work\\C++\\imgui\\color_picker\\resoures\\MyImage01.jpg";
+        char filepath[512] = "resoures\\MyImage01.jpg";
         GLuint my_image_texture = 0;
         
         //Application variables

@@ -1,12 +1,25 @@
 #include "rendercontent.h"
 #include "imgui.h"
 #include "imageFunctions.h"
+#include <iostream>
 
 imageController imageControl;
 
 namespace renderSpace
 {
+    //manage the drop of the file into the window
+    void drop_callback(GLFWwindow* window, int count, const char* paths[])
+    {
+        for (int i = 0; i < count; i++)
+        {
+            std::cout<<"Dropped file: "<<paths[i]<<" \n" ;
+            bool ret = imageControl.LoadTextureFromFile(paths[i], &imageControl.my_image_texture, &imageControl.my_image_width, &imageControl.my_image_height);
+            imageControl.zoomFactor = 1.0f;
+            imageControl.isImageLoaded = ret;
+        }
+    }
 
+    //Render manager for the complete UI
     void renderUI(GLFWwindow* window){
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
@@ -18,7 +31,7 @@ namespace renderSpace
         renderImageBox(display_w, display_h);
     }
 
-
+    //Individual box renderers
     void renderImageSelectionBox(int display_w, int display_h){
         //Backend for the image selection box
         ImGuiIO& io = ImGui::GetIO();
@@ -98,13 +111,14 @@ namespace renderSpace
         ImGui::SetNextWindowSize(ImVec2(previewBoxSizeX, previewBoxSizeY));
         ImGui::Begin("Image viewer", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
         if(imageControl.isImageLoaded){
-            ImGui::Text("pointer = %x", imageControl.my_image_texture);
-            ImGui::Text("size = %d x %d", imageControl.my_image_width, imageControl.my_image_height);
+            // ImGui::Text("pointer = %x", imageControl.my_image_texture);
+            // ImGui::Text("size = %d x %d", imageControl.my_image_width, imageControl.my_image_height);
             ImGui::SetCursorPos(ImVec2(((previewBoxXPos + previewBoxSizeX) / 2 - ( imageControl.my_image_width * imageControl.zoomFactor ) / 2 ), ((previewBoxYPos + previewBoxSizeY) / 2 - ( imageControl.my_image_height * imageControl.zoomFactor ) / 2 )));
             ImGui::Image((void*)(intptr_t)imageControl.my_image_texture, ImVec2(imageControl.my_image_width*imageControl.zoomFactor, imageControl.my_image_height*imageControl.zoomFactor));
         }
         else{
-            ImGui::Text("No Image Loaded");
+            ImGui::SetCursorPos(ImVec2(((previewBoxXPos + previewBoxSizeX) / 2 - 200), ((previewBoxYPos + previewBoxSizeY) / 2 - 50)));
+            ImGui::Text("                   No Image Loaded\n\nPlease load the filepath or drop the image into the window");
         }
         
         //Code to check if the zoom factor needs change

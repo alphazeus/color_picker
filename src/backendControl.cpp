@@ -11,6 +11,8 @@ void openGLController::glfw_error_callback(int error, const char* description)
 GLFWwindow* openGLController::initGlfwWindow(int width, int height, const char* title)
 {
     glfwSetErrorCallback(glfw_error_callback);
+
+
     if (!glfwInit())
         return nullptr;
     
@@ -19,6 +21,8 @@ GLFWwindow* openGLController::initGlfwWindow(int width, int height, const char* 
     if (window == nullptr)
         return nullptr;
 
+    glfwSetDropCallback(window, renderSpace::drop_callback);
+    
     titleIconize titleIcon;
     glfwSetWindowIcon(window, 1, &titleIcon.titleIcon);
     glfwMakeContextCurrent(window);

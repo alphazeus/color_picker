@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(color_picker VERSION 0.1.0 LANGUAGES C CXX)
 
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard" FORCE)
+endif()
+
 add_subdirectory(lib/glfw-3.4)
 
 FILE(GLOB_RECURSE imgui_files lib/imgui/*.h lib/imgui/*.cpp) 

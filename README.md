@@ -9,6 +9,7 @@ Lightweight GLFW + ImGUI based onscreen color picker application (PoC for ImGui 
 - Resizable window.
 - Support for JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC formats.
 - Color Picker with RGB and HSV Conversion.
+- Drag and drop functionality to add images onto the window
 
 ## Dependencies (Built with)  
 -   GLFW 3.4
@@ -29,6 +30,7 @@ Lightweight GLFW + ImGUI based onscreen color picker application (PoC for ImGui 
 - [X] Correcting the file system
 - [X] Display of Color picked
 - [X] Converstion to other color spaces (HSV)
+- [X] Added drag and drop function to the application
 - [ ] Change the title icon with custom one
 - [ ] Create Custom Titlebar
 
